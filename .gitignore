@@ -1,0 +1,13 @@
+# Windows
+Thumbs.db
+desktop.ini
+
+# macOS
+.DS_Store
+
+# Backup files created by setup scripts
+*.backup-*
+
+# Editor
+*.swp
+*.swo

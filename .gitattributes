@@ -1,0 +1,10 @@
+* text=auto
+
+# Shell scripts always use LF
+*.sh text eol=lf
+
+# PowerShell can use CRLF
+*.ps1 text eol=crlf
+
+# Markdown auto
+*.md text eol=lf
