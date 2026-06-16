@@ -2,66 +2,64 @@
 name: context-loader
 description: >
   Auto-detect the project type from cwd and load the appropriate context files
-  from ~/.ai-context/context/. Trigger at session start (via CLAUDE.md bootstrap),
-  when the user says "load context", "bootstrap session", or "載入 context".
+  from ~/.ai-context/. Trigger at session start (via CLAUDE.md bootstrap),
+  or when the user says "load context", "bootstrap session", or "載入 context".
 ---
 
 # Context Loader
 
 ## Step 1: Resolve Context Root
 
-Determine `AI_CONTEXT` path based on environment:
-
-| Environment | Path |
+| Environment | `AI_CONTEXT` path |
 |---|---|
-| Windows (Claude Code / VSCode) | `C:\Users\<user>\.ai-context\` |
-| WSL / Linux | `~/.ai-context/` |
-| SSH remote | `~/.ai-context/` |
+| Windows (Claude Code / VSCode) | `C:\Users\<user>\.ai-context` |
+| WSL / Linux | `~/.ai-context` |
+| SSH remote | `~/.ai-context` |
 
-If the path doesn't exist, report the issue and stop — the setup script has not been run yet.
+If the path doesn't exist, stop and report: "~/.ai-context not found — please run the setup script first."
 
-## Step 2: Detect Project Type
+## Step 2: Always Load Global Context
 
-Check for these marker files in cwd:
+Read `<AI_CONTEXT>/context/global.md` first (personal background, applies to all projects).
 
-| Marker | Project Type |
+## Step 3: Detect Project
+
+### Auto-detect from marker files in cwd
+
+| Marker files | Project file to load |
 |---|---|
-| `CMakeLists.txt` AND any `mt_unf_*.h` in `include/` | `sym6-porting` |
-| `robot/` directory AND `*.robot` files | `hil-robot` |
-| `project.yml` (Ceedling) | `unit-test` |
-| none of the above | `generic` |
+| `CMakeLists.txt` + any `mt_unf_*.h` in `include/` | `projects/nagra-tntsat.md` |
+| `robot/` directory + `*.robot` files | `projects/nagra-tntsat.md` |
+| `project.yml` (Ceedling) | `projects/nagra-tntsat.md` |
+| `Android.bp` or `AOSP` in path | `projects/android-aosp.md` |
 
-## Step 3: Load Context by Type
+If a match is found, confirm with user:
+```
+Detected project: nagra-tntsat. Load this? [Y/n]
+```
 
-### sym6-porting
-Read in order:
-1. `<AI_CONTEXT>/context/nagra-tntsat.md`
-2. `<AI_CONTEXT>/context/test-strategy.md`
-3. List headers in `include/` — ask which modules are in scope today
+### Fallback: list available projects
 
-### hil-robot
-Read in order:
-1. `<AI_CONTEXT>/context/nagra-tntsat.md`
-2. List all `.robot` and `.resource` files under `robot/resources/` — ask which to load
+If no marker matches, list all `.md` files in `<AI_CONTEXT>/projects/` (excluding `_template.md`) and ask:
+```
+No project auto-detected. Available projects:
+1. nagra-tntsat
+2. android-aosp
+Which project? (enter number or name, or 0 to skip)
+```
 
-### unit-test
-Read in order:
-1. `<AI_CONTEXT>/context/test-strategy.md`
-2. List test suites under `test/` — ask which are in scope
+## Step 4: Load Project Context
 
-### generic
-1. `<AI_CONTEXT>/context/global.md`
+Read `<AI_CONTEXT>/projects/<selected>.md`.
 
-## Step 4: Confirm and Proceed
+## Step 5: Confirm and Proceed
 
-Output exactly this summary, then wait:
+Output this summary, then wait:
 
 ```
 ## Session Context Loaded
 - Environment: <Windows / WSL / SSH>
-- Project type: <type>
-- Files loaded:
-  - <file1>
-  - <file2>
+- Global: context/global.md ✓
+- Project: projects/<name>.md ✓
 Ready. What are we working on today?
 ```
