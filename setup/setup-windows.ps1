@@ -24,15 +24,37 @@ function New-Symlink {
 
     if (Test-Path $LinkPath -ErrorAction SilentlyContinue) {
         $item = Get-Item $LinkPath -Force
+
+        # 已是 symlink，跳過
         if ($item.LinkType -eq "SymbolicLink") {
             Write-Skip "$LinkPath (已是 symlink)"
             return
         }
+
+        # 偵測到現有檔案，詢問用戶
+        Write-Host ""
+        Write-Host "[!] 偵測到現有檔案: $LinkPath" -ForegroundColor Yellow
+        Write-Host "    此檔案將被備份，並以 symlink 取代。" -ForegroundColor Yellow
+        Write-Host "    建議之後將舊內容合併進: $Target" -ForegroundColor Yellow
+        Write-Host ""
+        $ans = Read-Host "    是否需要我開啟兩個檔案供你比對合併？(y/n)"
+
         # 備份現有檔案
         $ts = Get-Date -Format "yyyyMMdd-HHmmss"
         $backup = "${LinkPath}.backup-${ts}"
         Move-Item $LinkPath $backup -Force
-        Write-Backup "備份 $LinkPath -> $backup"
+        Write-Backup "備份完成: $backup"
+
+        # 若用戶要合併，用 VSCode 並排開啟
+        if ($ans -match "^[Yy]") {
+            Write-Host "    開啟 VSCode 比對中..." -ForegroundColor Cyan
+            # 先建立 symlink，再用 diff 開啟備份 vs 新目標
+            New-Item -ItemType SymbolicLink -Path $LinkPath -Target $Target -Force | Out-Null
+            code --diff $backup $Target
+            Write-Host "    合併完成後請儲存 $Target，備份可手動刪除。" -ForegroundColor Cyan
+            Write-OK "$LinkPath -> $Target"
+            return
+        }
     }
 
     $type = if ($IsDir) { "Directory" } else { "Junction" }
