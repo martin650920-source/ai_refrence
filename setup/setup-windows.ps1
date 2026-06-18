@@ -57,7 +57,6 @@ function New-Symlink {
         }
     }
 
-    $type = if ($IsDir) { "Directory" } else { "Junction" }
     New-Item -ItemType SymbolicLink -Path $LinkPath -Target $Target -Force | Out-Null
     Write-OK "$LinkPath -> $Target"
 }
