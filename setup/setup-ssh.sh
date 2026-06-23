@@ -94,7 +94,10 @@ link "$GEMINI_HOME/GEMINI.md" "$AI_CONTEXT_GIT/rules/gemini-global.md"
 mkdir -p "$CODEX_HOME"
 link "$CODEX_HOME/instructions.md" "$AI_CONTEXT_GIT/rules/codex-global.md"
 
-# 7. 設定 cron 自動 git pull（log 到 ~/.ai-context-pull.log）
+# 7. Claude: ~/.claude/statusline.sh
+link "$CLAUDE_HOME/statusline.sh" "$AI_CONTEXT_GIT/config/statusline.sh"
+
+# 8. 設定 cron 自動 git pull（log 到 ~/.ai-context-pull.log）
 CRON_LOG="$HOME/.ai-context-pull.log"
 echo ""
 read -rp "是否設定每日 09:00 自動 git pull？[y/N] " ans
@@ -113,6 +116,7 @@ for f in \
     "$AI_CONTEXT" \
     "$CLAUDE_HOME/CLAUDE.md" \
     "$CLAUDE_HOME/skills/gdrive" \
+    "$CLAUDE_HOME/statusline.sh" \
     "$GEMINI_HOME/GEMINI.md" \
     "$CODEX_HOME/instructions.md"
 do
