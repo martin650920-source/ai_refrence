@@ -82,9 +82,21 @@ link "$AI_CONTEXT" "$AI_CONTEXT_GIT"
 mkdir -p "$CLAUDE_HOME"
 link "$CLAUDE_HOME/CLAUDE.md" "$AI_CONTEXT_GIT/rules/claude-global.md"
 
-# 4. Claude: ~/.claude/skills/gdrive
+# 4. Claude: ~/.claude/skills/<name>  — 每個 skill 各建一條 symlink
 mkdir -p "$CLAUDE_HOME/skills"
-link "$CLAUDE_HOME/skills/gdrive" "$AI_CONTEXT_GIT/skills"
+# 移除舊的整目錄 symlink（若存在）
+if [ -L "$CLAUDE_HOME/skills/gdrive" ]; then
+    rm "$CLAUDE_HOME/skills/gdrive"
+    ok "移除舊 symlink: $CLAUDE_HOME/skills/gdrive"
+fi
+if [ -d "$AI_CONTEXT_GIT/skills" ]; then
+    for skill_dir in "$AI_CONTEXT_GIT/skills"/*/; do
+        skill_name="$(basename "$skill_dir")"
+        link "$CLAUDE_HOME/skills/$skill_name" "$AI_CONTEXT_GIT/skills/$skill_name"
+    done
+else
+    skip "$AI_CONTEXT_GIT/skills 不存在，跳過 skill symlink"
+fi
 
 # 5. Gemini CLI: ~/.gemini/GEMINI.md
 mkdir -p "$GEMINI_HOME"
@@ -115,7 +127,6 @@ echo -e "${CYAN}=== 驗證結果 ===${NC}"
 for f in \
     "$AI_CONTEXT" \
     "$CLAUDE_HOME/CLAUDE.md" \
-    "$CLAUDE_HOME/skills/gdrive" \
     "$CLAUDE_HOME/statusline.sh" \
     "$GEMINI_HOME/GEMINI.md" \
     "$CODEX_HOME/instructions.md"
@@ -124,6 +135,16 @@ do
         echo -e "  ${GREEN}$f${NC} -> $(readlink "$f")"
     else
         echo -e "  ${RED}[MISSING] $f${NC}"
+    fi
+done
+echo "  Skills:"
+for skill_dir in "$AI_CONTEXT_GIT/skills"/*/; do
+    skill_name="$(basename "$skill_dir")"
+    f="$CLAUDE_HOME/skills/$skill_name"
+    if [ -L "$f" ]; then
+        echo -e "    ${GREEN}$f${NC} -> $(readlink "$f")"
+    else
+        echo -e "    ${RED}[MISSING] $f${NC}"
     fi
 done
 
