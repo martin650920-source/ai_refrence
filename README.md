@@ -8,6 +8,8 @@
 
 ```
 ai_refrence/
+├── config/
+│   └── statusline.sh      # Claude Code status bar 腳本
 ├── context/
 │   └── global.md          # 所有專案共用的個人背景（環境、工具、偏好）
 ├── projects/
@@ -79,6 +81,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/martin650920-source/ai_refre
 | 建立 `~/.ai-context` symlink | → repo 根目錄 |
 | Claude 全域指令 | `~/.claude/CLAUDE.md` → `rules/claude-global.md` |
 | Claude skills | `~/.claude/skills/gdrive` → `skills/` |
+| Claude status bar | `~/.claude/statusline.sh` → `config/statusline.sh` |
 | Gemini 全域指令 | `~/.gemini/GEMINI.md` → `rules/gemini-global.md` |
 | Codex 全域指令 | `~/.codex/instructions.md` → `rules/codex-global.md` |
 
