@@ -87,6 +87,9 @@ New-Symlink -LinkPath "$GeminiHome\GEMINI.md" -Target "$GDriveRoot\rules\gemini-
 if (-not (Test-Path $CodexHome)) { New-Item -ItemType Directory -Path $CodexHome | Out-Null }
 New-Symlink -LinkPath "$CodexHome\instructions.md" -Target "$GDriveRoot\rules\codex-global.md"
 
+# 6. Claude: ~/.claude/statusline.sh
+New-Symlink -LinkPath "$ClaudeHome\statusline.sh" -Target "$GDriveRoot\config\statusline.sh"
+
 # ── 驗證 ─────────────────────────────────────────
 Write-Host ""
 Write-Host "=== 驗證結果 ===" -ForegroundColor Cyan
@@ -94,6 +97,7 @@ Write-Host "=== 驗證結果 ===" -ForegroundColor Cyan
     $AiContext,
     "$ClaudeHome\CLAUDE.md",
     "$ClaudeHome\skills\gdrive",
+    "$ClaudeHome\statusline.sh",
     "$GeminiHome\GEMINI.md",
     "$CodexHome\instructions.md"
 ) | ForEach-Object {

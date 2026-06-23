@@ -84,6 +84,9 @@ link "$GEMINI_HOME/GEMINI.md" "$GDRIVE/rules/gemini-global.md"
 mkdir -p "$CODEX_HOME"
 link "$CODEX_HOME/instructions.md" "$GDRIVE/rules/codex-global.md"
 
+# 6. Claude: ~/.claude/statusline.sh
+link "$CLAUDE_HOME/statusline.sh" "$GDRIVE/config/statusline.sh"
+
 # ── 驗證 ─────────────────────────────────────────
 echo ""
 echo -e "${CYAN}=== 驗證結果 ===${NC}"
@@ -91,6 +94,7 @@ for f in \
     "$AI_CONTEXT" \
     "$CLAUDE_HOME/CLAUDE.md" \
     "$CLAUDE_HOME/skills/gdrive" \
+    "$CLAUDE_HOME/statusline.sh" \
     "$GEMINI_HOME/GEMINI.md" \
     "$CODEX_HOME/instructions.md"
 do
