@@ -12,11 +12,13 @@ description: >
 
 | Environment | `AI_CONTEXT` path |
 |---|---|
-| Windows (Claude Code / VSCode) | `C:\Users\<user>\.ai-context` |
+| Windows (Claude Code / VSCode) | `$env:USERPROFILE\.ai-context` (PowerShell) / `%USERPROFILE%\.ai-context` (cmd) |
 | WSL / Linux | `~/.ai-context` |
 | SSH remote | `~/.ai-context` |
 
-If the path doesn't exist, stop and report: "~/.ai-context not found — please run the setup script first."
+On Windows, resolve the actual path by expanding `$env:USERPROFILE` — do not assume `C:\Users\<name>`.
+
+If the path doesn't exist, stop and report: "`~/.ai-context` not found — please run the setup script first (setup\setup-windows.ps1 on Windows, setup/setup-wsl.sh on WSL, setup/setup-ssh.sh on SSH)."
 
 ## Step 2: Always Load Global Context
 

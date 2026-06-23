@@ -15,9 +15,9 @@ GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; RED='\033[0;31m'; NC
 ok()     { echo -e "${GREEN}[OK]    ${NC} $*"; }
 skip()   { echo -e "${YELLOW}[SKIP]  ${NC} $*"; }
 backup() { echo -e "${CYAN}[BACKUP]${NC} $*"; }
-err()    { echo -e "${RED}[ERROR] ${NC} $*"; }
+err()    { echo -e "${RED}[ERROR] ${NC} $*" >&2; }
 
-# 建立 symlink，若目標已存在則提示並詢問是否協助合併
+# 建立 symlink，若路徑已存在則顯示選單讓 user 決定
 link() {
     local src="$1" target="$2"
 
@@ -28,29 +28,22 @@ link() {
     fi
 
     if [ -e "$src" ]; then
-        # 提示用戶並詢問是否需要協助合併
         echo ""
-        echo -e "${YELLOW}[!] 偵測到現有檔案: $src${NC}"
-        echo -e "${YELLOW}    此檔案將被備份，並以 symlink 取代。${NC}"
-        echo -e "${YELLOW}    建議之後將舊內容合併進: $target${NC}"
+        echo -e "${YELLOW}[!] 偵測到現有路徑: $src${NC}"
         echo ""
-        read -rp "    是否需要在建立 symlink 後開啟兩個檔案供比對合併？[y/N] " ans
+        echo "    1) 蓋過  (備份後建立 symlink 指向 $target)"
+        echo "    2) 忽略  (保留現有內容，跳過此步驟)"
+        echo ""
+        read -rp "    請選擇 [1/2]: " choice
+
+        if [[ "$choice" != "1" ]]; then
+            skip "$src (忽略)"
+            return
+        fi
 
         local bak="${src}.backup-$(date +%Y%m%d-%H%M%S)"
         mv "$src" "$bak"
         backup "備份完成: $bak"
-
-        mkdir -p "$(dirname "$src")"
-        ln -s "$target" "$src"
-        ok "$src -> $target"
-
-        # 若用戶要合併，用 diff 並排顯示
-        if [[ "${ans,,}" == "y" ]]; then
-            echo -e "${CYAN}    開啟 diff 比對（合併完成後請儲存 $target）:${NC}"
-            diff "$bak" "$target" || true
-            echo -e "${CYAN}    備份位置: $bak（確認合併完畢後可手動刪除）${NC}"
-        fi
-        return
     fi
 
     mkdir -p "$(dirname "$src")"
@@ -76,6 +69,7 @@ fi
 link "$AI_CONTEXT" "$GDRIVE"
 
 # 2. Claude: ~/.claude/CLAUDE.md
+mkdir -p "$CLAUDE_HOME"
 link "$CLAUDE_HOME/CLAUDE.md" "$GDRIVE/rules/claude-global.md"
 
 # 3. Claude: ~/.claude/skills/gdrive  →  skills 目錄
