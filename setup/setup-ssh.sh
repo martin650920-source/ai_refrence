@@ -111,14 +111,18 @@ link "$CLAUDE_HOME/statusline.sh" "$AI_CONTEXT_GIT/config/statusline.sh"
 
 # 8. 設定 cron 自動 git pull（log 到 ~/.ai-context-pull.log）
 CRON_LOG="$HOME/.ai-context-pull.log"
-echo ""
-read -rp "是否設定每日 09:00 自動 git pull？[y/N] " ans
-if [[ "${ans,,}" == "y" ]]; then
-    CRON_CMD="0 9 * * * git -C \"$AI_CONTEXT_GIT\" pull --ff-only >> \"$CRON_LOG\" 2>&1"
-    ( crontab -l 2>/dev/null | grep -v "ai-context-git"; echo "$CRON_CMD" ) | crontab -
-    ok "cron 已設定（log: $CRON_LOG）"
+if [ -t 0 ]; then
+    echo ""
+    read -rp "是否設定每日 09:00 自動 git pull？[y/N] " ans
+    if [[ "${ans,,}" == "y" ]]; then
+        CRON_CMD="0 9 * * * git -C \"$AI_CONTEXT_GIT\" pull --ff-only >> \"$CRON_LOG\" 2>&1"
+        ( crontab -l 2>/dev/null | grep -v "ai-context-git"; echo "$CRON_CMD" ) | crontab -
+        ok "cron 已設定（log: $CRON_LOG）"
+    else
+        echo "跳過 cron 設定。手動更新: git -C \"$AI_CONTEXT_GIT\" pull"
+    fi
 else
-    echo "跳過 cron 設定。手動更新: git -C \"$AI_CONTEXT_GIT\" pull"
+    skip "非互動模式，跳過 cron 設定。手動更新: git -C \"$AI_CONTEXT_GIT\" pull"
 fi
 
 # ── 驗證 ─────────────────────────────────────────
