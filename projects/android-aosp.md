@@ -80,6 +80,17 @@ adb shell stop media && adb shell start media
 git checkout -- device/realtek flash_writer image_file kernel packages vendor/realtek build/make/target/product/security/
 ```
 
+## Full Image 升級流程
+
+Build full image（`bash build_all.sh INVERTO`）完成後：
+
+```bash
+# 複製到隨身碟（替換為實際掛載點）
+cp /src/martin_wang/1319D_Q3Q4/realtek_a14/image_file/out/* <隨身碟掛載點>/
+```
+
+接上 STB，**按住 Tab 鍵開機**進行 USB 升級。
+
 ## 已知限制與注意事項
 
 - **絕對不要** `git add / commit` realtek_a14 裡的任何變更
